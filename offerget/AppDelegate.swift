@@ -15,9 +15,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         requestPermissions()
     }
     
-    // 设置全局快捷键 (Cmd+Shift+5)
+    // 设置全局快捷键 (Cmd+Shift+6)
     private func setupGlobalHotkey() {
-        hotKey = HotKey(key: .five, modifiers: [.command, .shift])
+        hotKey = HotKey(key: .six, modifiers: [.command, .shift])
         
         hotKey?.keyDownHandler = { [weak self] in
             self?.captureScreen()
