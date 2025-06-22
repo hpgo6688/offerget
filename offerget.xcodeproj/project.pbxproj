@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		EA3B547A2E085FE500F27B71 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = EA3B54792E085FE500F27B71 /* HotKey */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		F91208BC2E08021E00D2EE9E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA3B547A2E085FE500F27B71 /* HotKey in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = offerget;
 			packageProductDependencies = (
+				EA3B54792E085FE500F27B71 /* HotKey */,
 			);
 			productName = offerget;
 			productReference = F91208AD2E08021C00D2EE9E /* offerget.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = F91208A42E08021C00D2EE9E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				EA3B54782E085FE500F27B71 /* XCRemoteSwiftPackageReference "HotKey" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F91208AE2E08021C00D2EE9E /* Products */;
 			projectDirPath = "";
@@ -396,6 +405,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZFAPH4VJ63;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -421,6 +431,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZFAPH4VJ63;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -541,6 +552,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		EA3B54782E085FE500F27B71 /* XCRemoteSwiftPackageReference "HotKey" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/soffes/HotKey";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		EA3B54792E085FE500F27B71 /* HotKey */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EA3B54782E085FE500F27B71 /* XCRemoteSwiftPackageReference "HotKey" */;
+			productName = HotKey;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F91208A52E08021C00D2EE9E /* Project object */;
 }
