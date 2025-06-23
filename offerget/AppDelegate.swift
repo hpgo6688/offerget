@@ -10,6 +10,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     
     // 启动完成时调用
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // 注意：使用 @NSApplicationDelegateAdaptor 时，不需要手动设置 NSApp.delegate
+        // SwiftUI 会自动处理这个
+        
         setupGlobalHotkey()
         setupStatusBarItem()
         requestPermissions()
@@ -52,52 +55,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     @objc func captureScreen() {
         Task {
             do {
-                let content = try await SCShareableContent.current
-                guard let display = content.displays.first else {
-                    showAlert(title: "无可用显示器", text: "未找到可捕获的显示器")
-                    return
-                }
-                
-                let config = SCStreamConfiguration()
-                config.width = display.width
-                config.height = display.height
-                
-                let image = try await SCScreenshotManager.captureImage(
-                    contentFilter: SCContentFilter(display: display, excludingWindows: []),
-                    configuration: config
-                )
-                
-                try await saveImage(image)
+                try await ScreenshotManager.captureAndSaveToDesktop()
                 sendNotification(title: "截屏成功", body: "截图已保存到桌面")
-                
             } catch {
                 showAlert(title: "截屏失败", text: error.localizedDescription)
-                
-                // 如果是权限问题，引导用户去设置
                 if error.localizedDescription.contains("TCC") {
                     NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
                 }
             }
         }
-    }
-    
-    // 保存图片到桌面
-    private func saveImage(_ cgImage: CGImage) async throws {
-        guard let desktopURL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first else {
-            throw NSError(domain: "无法获取桌面路径", code: 404)
-        }
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyyMMdd_HHmmss"
-        let filename = "截图_\(dateFormatter.string(from: Date())).png"
-        let fileURL = desktopURL.appendingPathComponent(filename)
-        
-        let imageRep = NSBitmapImageRep(cgImage: cgImage)
-        guard let pngData = imageRep.representation(using: .png, properties: [:]) else {
-            throw NSError(domain: "图片转换失败", code: 500)
-        }
-        
-        try pngData.write(to: fileURL)
     }
     
     // 显示系统通知
@@ -130,10 +96,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
 
 // 关键扩展：使AppDelegate能在SwiftUI中使用
 extension AppDelegate {
-    static func shared() -> AppDelegate {
-        NSApp.delegate as! AppDelegate
-    }
-    
     func updateHotkey(key: Key, modifiers: NSEvent.ModifierFlags) {
         hotKey = HotKey(key: key, modifiers: modifiers)
         setupGlobalHotkey()

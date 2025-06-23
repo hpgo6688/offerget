@@ -14,7 +14,8 @@ struct OfferGetApp: App {
             // 添加菜单栏命令
             CommandGroup(replacing: .newItem) {
                 Button("截屏") {
-                    AppDelegate.shared().captureScreen()
+                    // 直接使用注入的 appDelegate 实例，这是最可靠的方式
+                    appDelegate.captureScreen()
                 }.keyboardShortcut("s", modifiers: [.command, .shift])
             }
         }

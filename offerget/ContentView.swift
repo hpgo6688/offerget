@@ -418,131 +418,24 @@ struct ContentView: View {
     
     func captureScreen() {
         guard !isCapturing else { return }
-        
         print("📸 开始截屏流程...")
         isCapturing = true
         statusMessage = "准备截屏..."
-        
         Task {
             do {
-                print("🔍 获取屏幕内容...")
-                let content = try await SCShareableContent.current
-                let displays = content.displays
-                
-                guard let display = displays.first else {
-                    print("❌ 未找到可用显示器")
-                    await MainActor.run {
-                        statusMessage = "未找到可用显示器"
-                        isCapturing = false
-                    }
-                    return
-                }
-                
-                print("✅ 找到显示器: \(display.width)x\(display.height)")
-                
+                try await ScreenshotManager.captureAndSaveToDesktop()
                 await MainActor.run {
-                    statusMessage = "正在截屏..."
+                    statusMessage = "截图已保存到桌面"
+                    isCapturing = false
                 }
-                
-                let configuration = SCStreamConfiguration()
-                configuration.width = display.width
-                configuration.height = display.height
-                
-                print("📸 开始截取屏幕图像...")
-                let image = try await SCScreenshotManager.captureImage(
-                    contentFilter: SCContentFilter(display: display, excludingWindows: []),
-                    configuration: configuration
-                )
-                
-                print("✅ 截屏成功，开始保存...")
-                // 保存图片
-                await saveImageToDesktop(image)
-                
             } catch {
-                print("❌ 截屏失败: \(error.localizedDescription)")
                 await MainActor.run {
                     statusMessage = "截屏失败: \(error.localizedDescription)"
                     isCapturing = false
-                    
-                    // 如果是权限问题，重新检查
-                    if error.localizedDescription.contains("TCC") {
-                        print("⚠️  检测到TCC权限问题，重新检查权限")
-                        permissionManager.checkAllPermissions()
-                    }
                 }
             }
         }
     }
-    
-    @MainActor
-    private func saveImageToDesktop(_ image: CGImage) async {
-        do {
-            // 1. 使用安全作用域书签获取桌面路径
-            // guard let desktopURL = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first else {
-            guard let desktopURL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first else {
-                throw NSError(domain: "无法获取桌面路径", code: 404)
-            }
-            
-            // 2. 检查写入权限
-            if !FileManager.default.isWritableFile(atPath: desktopURL.path) {
-                throw NSError(domain: "无写入权限", code: 403)
-            }
-            
-            // 3. 创建唯一文件名
-            let timestamp = Int(Date().timeIntervalSince1970)
-            let imageURL = desktopURL.appendingPathComponent("screenshot_\(timestamp).png")
-            
-            // 4. 使用安全写入方式
-            let imageRep = NSBitmapImageRep(cgImage: image)
-            guard let pngData = imageRep.representation(using: .png, properties: [:]) else {
-                throw NSError(domain: "图片转换失败", code: 500)
-            }
-            
-            // 5. 实际写入操作
-            try pngData.write(to: imageURL, options: [.atomic, .completeFileProtection])
-            
-            await MainActor.run {
-                statusMessage = "截图已保存到: \(imageURL.lastPathComponent)"
-                isCapturing = false
-            }
-            
-        } catch {
-            await handleSaveError(error)
-        }
-    }
-
-//    @MainActor
-//    private func saveImageToDesktop(_ image: CGImage) async {
-//        do {
-//            let desktopURL = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first!
-//            let timestamp = Int(Date().timeIntervalSince1970)
-//            let imageURL = desktopURL.appendingPathComponent("screenshot_\(timestamp).png")
-//            
-//            print("💾 保存截图到: \(imageURL.path)")
-//            
-//            let imageRep = NSBitmapImageRep(cgImage: image)
-//            let pngData = imageRep.representation(using: .png, properties: [:])!
-//            
-//            try pngData.write(to: imageURL)
-//            
-//            print("✅ 截图保存成功")
-//            statusMessage = "截屏成功！已保存到桌面"
-//            isCapturing = false
-//            
-//            // 发送通知
-//            if permissionManager.hasNotificationPermission {
-//                print("📬 发送成功通知")
-//                sendNotification(message: "截屏已保存到桌面")
-//            } else {
-//                print("⚠️  跳过通知发送，权限不足")
-//            }
-//            
-//        } catch {
-//            print("❌ 保存截图失败: \(error.localizedDescription)")
-//            statusMessage = "保存失败: \(error.localizedDescription)"
-//            isCapturing = false
-//        }
-//    }
     
     private func sendNotification(message: String) {
         print("📬 准备发送通知: \(message)")
